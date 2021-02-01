@@ -21,7 +21,7 @@ router.get('/:code', async (req, res, next) => {
         let companyRes = await db.query(
             `SELECT code, name, description
              FROM companies
-             WHERE code=$1`, [req.params.code]
+             WHERE code = $1`, [req.params.code]
         );
         let company = companyRes.rows[0];
 
