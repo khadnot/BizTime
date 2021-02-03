@@ -1,7 +1,8 @@
 const db = require('../db');
 const express = require('express');
 const router = new express.Router();
-const ExpressError = require('../expressError')
+const ExpressError = require('../expressError');
+const slugify = require('slugify');
 
 router.get('/', async (req, res, next) => {
     try {
@@ -39,11 +40,12 @@ router.get('/:code', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
     try {
-        const { code, name, description } = req.body;
+        const { name, description } = req.body;
+        const code = slugify(req.body.name, { remove: /[*+~.()'"!:@&]/g, lower: true });
         let newCompany = await db.query(
             `INSERT INTO companies
              VALUES ($1, $2, $3)
-             RETURNING code, name, description`, [code, name, description]
+             RETURNING code, name, description`, [ code, name, description ]
         );
         res.json({ 'company': newCompany.rows });
     } catch {
