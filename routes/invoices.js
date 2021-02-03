@@ -70,4 +70,25 @@ router.post('/', async (req, res, next) => {
     }
 });
 
+router.put('/:id', async (req, res, next) => {
+    try {
+        const { amt } = req.body;
+        let id = req.params.id;
+        let editInvoice = await db.query(
+            `UPDATE invoices
+             SET amt = $1
+             WHERE id = $2
+             RETURNING id, comp_code, amt, paid, add_date, paid_date`, [amt, id]
+        );
+        if (editInvoice.rows.length === 0) {
+            const err = new ExpressError('Invoice not found', 404);
+            return next(err);
+        };
+        res.json({ 'invoice': editInvoice.rows });
+    } catch {
+        const err = new ExpressError('Error retrieving from database', 400);
+        return next(err);
+    }
+});
+
 module.exports = router
