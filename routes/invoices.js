@@ -2,6 +2,7 @@ const db = require('../db');
 const express = require('express');
 const router = new express.Router();
 const ExpressError = require('../expressError')
+const moment = require('moment');
 
 router.get('/', async (req, res, next) => {
     try {
@@ -72,19 +73,35 @@ router.post('/', async (req, res, next) => {
 
 router.put('/:id', async (req, res, next) => {
     try {
-        const { amt } = req.body;
+        const { amt, paid } = req.body;
         let id = req.params.id;
-        let editInvoice = await db.query(
-            `UPDATE invoices
-             SET amt = $1
-             WHERE id = $2
-             RETURNING id, comp_code, amt, paid, add_date, paid_date`, [amt, id]
-        );
-        if (editInvoice.rows.length === 0) {
-            const err = new ExpressError('Invoice not found', 404);
-            return next(err);
-        };
-        res.json({ 'invoice': editInvoice.rows });
+        if (paid === 't') {
+            let paid_date = moment().format('YYYY-MM-DD');
+            let editInvoice = await db.query(
+                `UPDATE invoices
+                 SET amt = $1, paid = $2, paid_date = $3
+                 WHERE id = $4
+                 RETURNING id, comp_code, amt, paid, add_date, paid_date`, [amt, paid, paid_date, id]
+            );
+            if (editInvoice.rows.length === 0) {
+                const err = new ExpressError('Invoice not found', 404);
+                return next(err);
+            };
+            res.json({ 'invoice': editInvoice.rows });
+        } else {
+            let paid_date = null;
+            let editInvoice = await db.query(
+                `UPDATE invoices
+                 SET amt = $1, paid = $2, paid_date = $3
+                 WHERE id = $4
+                 RETURNING id, comp_code, amt, paid, add_date, paid_date`, [amt, paid, paid_date, id]
+            );
+            if (editInvoice.rows.length === 0) {
+                const err = new ExpressError('Invoice not found', 404);
+                return next(err);
+            };
+            res.json({ 'invoice': editInvoice.rows });
+        }
     } catch {
         const err = new ExpressError('Error retrieving from database', 400);
         return next(err);
