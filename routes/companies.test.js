@@ -58,12 +58,25 @@ describe('POST /companies route', function () {
     });
 });
 
-describe('PATCH /companies route', function () {
+describe('PUT /companies route', function () {
     it('Updates a company in the database', async function () {
         const resp = await request(app)
-                          .patch('companies/tar')
+                          .put('/companies/tar')
                           .send({
-                              
-                          })
-    })
-})
+                            name: 'Verizon',
+                            description: 'Evil Phone Corporation'
+                          });
+        expect(resp.statusCode).toBe(200);
+        expect(resp.body.company[0]).toHaveProperty('name');
+        expect(resp.body.company[0]).toHaveProperty('code');
+        expect(resp.body.company[0]).toHaveProperty('description');
+        expect(resp.body.company[0].name).toEqual('Verizon');
+        expect(resp.body.company[0].code).toEqual('tar');
+        expect(resp.body.company[0].description).toEqual('Evil Phone Corporation');
+    });
+
+    it('Responds with a 404 if company can not be found', async function () {
+        const resp = await request(app).put('/companies/tarp');
+        expect(resp.statusCode).toBe(404);
+    });
+});
