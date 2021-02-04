@@ -40,3 +40,30 @@ describe('GET /companies/:code route', function () {
     });
 });
 
+describe('POST /companies route', function () {
+    it('Creates a new company to add to the database', async function () {
+        const resp = await request(app)
+                           .post('/companies')
+                           .send({
+                               name: 'Wal-Mart',
+                               description: 'Cheap Evil Corporation'
+                           });
+        expect(resp.statusCode).toBe(200);
+        expect(resp.body.company[0]).toHaveProperty('name');
+        expect(resp.body.company[0]).toHaveProperty('code');
+        expect(resp.body.company[0]).toHaveProperty('description');
+        expect(resp.body.company[0].name).toEqual('Wal-Mart');
+        expect(resp.body.company[0].code).toEqual('wal-mart');
+        expect(resp.body.company[0].description).toEqual('Cheap Evil Corporation');
+    });
+});
+
+describe('PATCH /companies route', function () {
+    it('Updates a company in the database', async function () {
+        const resp = await request(app)
+                          .patch('companies/tar')
+                          .send({
+                              
+                          })
+    })
+})
