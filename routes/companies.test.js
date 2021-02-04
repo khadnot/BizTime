@@ -80,3 +80,12 @@ describe('PUT /companies route', function () {
         expect(resp.statusCode).toBe(404);
     });
 });
+
+describe('DELETE /companies/code route', function () {
+    it('Deletes a single company from the database', async function () {
+        const resp = await request(app)
+                           .delete('/companies/tar');
+        expect(resp.statusCode).toBe(200);
+        expect(resp.body).toEqual({ message: 'deleted' })
+    })
+})
